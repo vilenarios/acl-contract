@@ -12,11 +12,13 @@ import { deployedContracts } from '../deployed-contracts';
 (async () => {
   //~~~~~~~~~~~~~~~~~~~~~~~~~~UPDATE THE BELOW~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // This is the Smartweave Source Code Transaction that will be added to the approved white list of ANTs
-  const antSourceCodeTxToAdd = 'JIIB01pRbNK2-UyNxwQK-6eknrjENMTpTvQmB8ZDzQg';
+  const roleName = 'Full Control';
+
+  const target = 'WALLET ADDRESS'
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   // This is the production ArNS Registry Smartweave Contract TX ID
-  const arnsRegistryContractTxId = deployedContracts.contractTxId;
+  const aclContractTxId = deployedContracts.contractTxId;
 
   // Initialize `LoggerFactory`
   LoggerFactory.INST.logLevel('error');
@@ -35,15 +37,15 @@ import { deployedContracts } from '../deployed-contracts';
     await fs.readFileSync(keyfile).toString(),
   );
 
-  // Read the ANT Registry Contract
-  const pst = warp.pst(arnsRegistryContractTxId);
+  // Read the Contract
+  const pst = warp.pst(aclContractTxId);
   pst.connect(wallet);
 
-  // Remove the record in ArNS Registry
-  console.log('Whitelisting the ANT Source Code: %s', antSourceCodeTxToAdd);
+  // Grant the role
   const txId = await pst.writeInteraction({
-    function: 'addANTSourceCodeTx',
-    contractTxId: antSourceCodeTxToAdd,
+    function: 'grantRole',
+    target,
+    roleName
   });
   console.log(
     'Finished adding the ANT Source Code TX to the approved white list with txid: %s',

@@ -3,31 +3,30 @@ export type DriveConfigState = {
   name: string; // The entity name (eg drive name, folder name, file name) plus 'Access Control List'
   ticker: string; // 9 character, all caps as ACL-ID where ID is the first 4 characters of the entity id
   entity: ArFSEntity; // The related arfs entity, like a drive, folder or file
-  permissions: Permission[]; // An array of all permissions available
+  permissions: Permission[]; // All permissions available
   roles: {
     [name: string]: Role; // A role is a grouping of permissions that can be given to a user
   };
   acl: {
-      [identity: string]: AccessControl[]; // A list of all role based access given to a user
+    [identity: string]: AccessControl[]; // A list of all role based access given to a user
   };
   evolve: string; // The new Smartweave Source Code transaction to evolve this contract to
 };
 
 export type AccessControl = {
-  permission: Permission, // the permssion given to this identity
-  start: number, // the block height this access control was granted.
-  end: number, // the block height this access control ends.
-  modifiedBy: string // the identity that last modified this access control
+  permission: Permission; // the permssion given to this identity
+  start: number; // the block height this access control was granted.
+  end: number; // the block height this access control ends.
+  modifiedBy: string; // the identity that last modified this access control
 };
 
-export enum Permission {
-  ViewItems = "view_items",
-  ViewVersions = "view_versions",
-  WriteFiles = "write_files",
-  CreateFolders = "create_folders",
-  ModifyItems = "modify_items",
-  ManagePermissions = "manage_permissions",
-};
+export type Permission =
+  | 'viewItems'
+  | 'viewVersions'
+  | 'writeFiles'
+  | 'createFolders'
+  | 'modifyItems'
+  | 'managePermissions';
 
 export type Role = {
   description: string; // A short, 256 character max description of the role
@@ -53,20 +52,18 @@ export type PstInput = {
   value: string | number;
 };
 
-export type PstResult = {
+export type AclResult = {
   target: string;
-  balance: number;
+  targetAcl: AccessControl[];
 };
 
-// TODO: handle purchasing additional undernames
 export type PstFunction =
-  | 'createPermission'
+  | 'grantPermission'
   | 'removePermission'
-  | 'createRole'
-  | 'removeRole'
   | 'grantRole'
-  | 'removeUser'
+  | 'removeRole'
+  | 'evolve';
 
 export type ContractResult =
   | { state: DriveConfigState }
-  | { result: PstResult }
+  | { aclResult: AclResult };

@@ -9,8 +9,8 @@ import { ContractResult, DriveConfigState, PstAction } from '../../types/types';
 declare const ContractError;
 declare const SmartWeave: any;
 
-// Modifies the fees for purchasing ArNS names
-export const grantRole = async (
+// Removes all user permissions associated with a role
+export const removeRole = async (
   state: DriveConfigState,
   { caller, input: { target, roleName } }: PstAction,
 ): Promise<ContractResult> => {
@@ -45,37 +45,25 @@ export const grantRole = async (
     throw new ContractError(DEFAULT_INVALID_PERMISSIONS_MESSAGE);
   }
 
-  // Does this user already have any ACLs? If so, lets update them
+  // The user must already be in the ACL to remove access controls.
   if (target in acl) {
     for (let i = 0; i < roles[roleName].permissions.length; i += 1) {
       for (let n = 0; n < acl[target].length; n += 1) {
         if (
           acl[target][n].permission === roles[roleName].permissions[i] &&
-          acl[target][n].end === 0
+          acl[target][n].end !== 0
         ) {
-          // Skip this permission as the user already has it
+          // Put an endling block date on this access control
+          acl[target][n].end = +SmartWeave.block.height;
+          acl[target][n].modifiedBy = caller;
         } else {
-          // Grant this user the permission
-          acl[target].push({
-            permission: roles[roleName].permissions[i],
-            start: +SmartWeave.block.height,
-            end: 0, // end of 0 means this is an active permissions and there is no end block height
-            modifiedBy: caller,
-          });
+          // Skip this access control as it has already ended for the user
         }
       }
     }
   } else {
-    // The user has no ACLs, so lets create their first one
-    acl[target] = [];
-    for (let i = 0; i < roles[roleName].permissions.length; i += 1) {
-      acl[target].push({
-        permission: roles[roleName].permissions[i],
-        start: +SmartWeave.block.height,
-        end: 0, // end of 0 means this is an active permissions and there is no end block height
-        modifiedBy: caller,
-      });
-    }
+    // This user has no access controls, so there is nothing to remove
+    throw new ContractError(DEFAULT_INVALID_TARGET_MESSAGE);
   }
 
   return { state };

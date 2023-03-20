@@ -6,7 +6,7 @@ import { testKeyfile } from '../constants';
 
 (async () => {
   // This is the testnet ArNS Registry Smartweave Contract TX ID
-  const arnsRegistryContractTxId =
+  const aclContractTxId =
     'ddFhy9E3P364rW5AxPJ2U1u5hPrNW1A0NOkxb4FwL9w';
 
   // ~~ Initialize warp ~~
@@ -19,7 +19,7 @@ import { testKeyfile } from '../constants';
   );
 
   // Read the ANT Registry Contract
-  const pst = warp.pst(arnsRegistryContractTxId);
+  const pst = warp.pst(aclContractTxId);
   pst.connect(wallet);
   const currentState = await pst.currentState();
   const currentStateString = JSON.stringify(currentState);
@@ -27,6 +27,6 @@ import { testKeyfile } from '../constants';
   console.log(currentStateJSON);
   console.log(
     'Finished getting the test ArNS state for the registry: %s',
-    arnsRegistryContractTxId,
+    aclContractTxId,
   );
 })();

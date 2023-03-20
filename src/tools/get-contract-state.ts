@@ -11,7 +11,7 @@ import { getCurrentBlockHeight } from '../utilities';
 
 (async () => {
   // This is the mainnet ArNS Registry Smartweave Contract TX ID
-  const arnsRegistryContractTxId =
+  const aclContractTxId =
     'bLAgYxAdX2Ry-nt6aH2ixgvJXbpsEYm28NgJgyqfs-U';
 
   // ~~ Initialize `LoggerFactory` ~~
@@ -32,7 +32,7 @@ import { getCurrentBlockHeight } from '../utilities';
   );
 
   // Read the ArNS Registry Contract
-  const pst = warp.pst(arnsRegistryContractTxId);
+  const pst = warp.pst(aclContractTxId);
   pst.connect(wallet);
   const currentState = await pst.currentState();
   const currentStateString = JSON.stringify(currentState, null, 5);
@@ -44,6 +44,6 @@ import { getCurrentBlockHeight } from '../utilities';
   fs.writeFileSync(fileName, currentStateString);
   console.log(
     'Finished getting the ArNS state for the registry: %s',
-    arnsRegistryContractTxId,
+    aclContractTxId,
   );
 })();

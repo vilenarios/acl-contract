@@ -12,7 +12,7 @@ import { testKeyfile } from '../constants';
 
 (async () => {
   // This is the testnet ArNS Registry Smartweave Contract TX ID
-  const arnsRegistryContractTxId = deployedTestContracts.contractTxId;
+  const aclContractTxId = deployedTestContracts.contractTxId;
 
   LoggerFactory.INST.logLevel('error');
 
@@ -30,7 +30,7 @@ import { testKeyfile } from '../constants';
   );
 
   // Read the ArNS Registry Contract
-  const contract = warp.pst(arnsRegistryContractTxId);
+  const contract = warp.pst(aclContractTxId);
   contract.connect(wallet);
 
   // ~~ Read contract source and initial state files ~~
@@ -53,7 +53,7 @@ import { testKeyfile } from '../constants';
 
   console.log(
     'Finished evolving the ArNS Smartweave Contract %s with TX %s. New contract id is: %s',
-    arnsRegistryContractTxId,
+    aclContractTxId,
     evolveInteractionTXId.originalTxId,
     evolveSrcTxId,
   );

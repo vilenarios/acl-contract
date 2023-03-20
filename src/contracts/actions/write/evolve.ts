@@ -1,12 +1,12 @@
 import { DEFAULT_NON_CONTRACT_OWNER_MESSAGE } from '@/constants.js';
 
-import { ContractResult, IOState, PstAction } from '../../types/types';
+import { ContractResult, DriveConfigState, PstAction } from '../../types/types';
 
 declare const ContractError;
 
 // Updates this contract to new source code
 export const evolve = async (
-  state: IOState,
+  state: DriveConfigState,
   { caller, input: { value } }: PstAction,
 ): Promise<ContractResult> => {
   const owner = state.owner;
@@ -16,7 +16,6 @@ export const evolve = async (
   }
 
   // TODO: regex on the string
-
   state.evolve = value.toString();
 
   return { state };

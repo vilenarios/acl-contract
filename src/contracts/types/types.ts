@@ -1,21 +1,24 @@
 export type DriveConfigState = {
   owner: string; // The owner of the drive
-  arfsEntity: ArFSEntity; // The related arfs entity, like a drive, folder or file
+  name: string; // The entity name (eg drive name, folder name, file name) plus 'Access Control List'
+  ticker: string; // 9 character, all caps as ACL-ID where ID is the first 4 characters of the entity id
+  entity: ArFSEntity; // The related arfs entity, like a drive, folder or file
   permissions: Permission[]; // An array of all permissions available
-  evolve: string; // The new Smartweave Source Code transaction to evolve this contract to
   roles: {
-    [roleName: string]: Role;
+    [name: string]: Role; // A role is a grouping of permissions that can be given to a user
   };
   acl: {
-      [identity: string]: AccessControl[];
+      [identity: string]: AccessControl[]; // A list of all role based access given to a user
   };
+  evolve: string; // The new Smartweave Source Code transaction to evolve this contract to
 };
 
 export type AccessControl = {
-  role: Role,
-  start: number,
-  end: number,
-}
+  permission: Permission, // the permssion given to this identity
+  start: number, // the block height this access control was granted.
+  end: number, // the block height this access control ends.
+  modifiedBy: string // the identity that last modified this access control
+};
 
 export enum Permission {
   ViewItems = "view_items",
@@ -24,27 +27,28 @@ export enum Permission {
   CreateFolders = "create_folders",
   ModifyItems = "modify_items",
   ManagePermissions = "manage_permissions",
-}
+};
 
 export type Role = {
-  description: string;
-  permissions: Permission[];
-}
+  description: string; // A short, 256 character max description of the role
+  permissions: Permission[]; // A list of all permissions this role has
+};
+
+export type ArFSEntity = {
+  id: string;
+  type: 'drive' | 'folder' | 'file';
+};
 
 export type PstAction = {
   input: PstInput;
   caller: string;
 };
 
-export type ArFSEntity = {
-  id: string;
-  type: 'drive' | 'folder' | 'file';
-}
-
 export type PstInput = {
   function: PstFunction;
-  driveId: string;
+  entityId: string;
   target: string;
+  roleName: string;
   permission: Permission;
   value: string | number;
 };
@@ -56,11 +60,11 @@ export type PstResult = {
 
 // TODO: handle purchasing additional undernames
 export type PstFunction =
-  | 'addPermission'
+  | 'createPermission'
   | 'removePermission'
   | 'createRole'
   | 'removeRole'
-  | 'addUser'
+  | 'grantRole'
   | 'removeUser'
 
 export type ContractResult =

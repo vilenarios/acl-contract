@@ -1,15 +1,32 @@
 {
-  "ticker": "ARNS-TEST",
-  "name": "Arweave Name System Test",
-  "version": "0.0.17",
   "owner": "",
-  "evolve": null,
-  "records": {},
-  "balances": {},
-  "approvedANTSourceCodeTxs": [],
-  "tiers": {
-    "current": {},
-    "history": []
+  "name": "ArFS Access Control List Test",
+  "ticker": "ACL-2C69",
+  "entity": {
+    "id": "2c69d539-7cab-4468-a2f4-793312c7ff53",
+    "type": "drive"
   },
-  "fees": {}
+  "permissions": ["view_items", "view_versions","write_files", "create_folders", "modify_items", "manage_permissions"],
+  "roles": {
+    "Full Control": {
+      "description": "This role can read, write and manage permissions on this entity",
+      "start": 0,
+      "end": 0,
+      "permissions": ["view_items", "view_versions","write_files", "create_folders", "modify_items", "manage_permissions"]
+    },
+    "Member": {
+      "description": "This role can read and write to this entity",
+      "start": 0,
+      "end": 0,
+      "permissions": ["view_items", "view_versions","write_files", "create_folders", "modify_items"]
+    },
+    "Guest": {
+      "description": "This role can read current and historical versions of this entity",
+      "start": 0,
+      "end": 0,
+      "permissions": ["view_items", "view_versions"]
+    }
+  },
+  "acl": {},
+  "evolve": null
 }

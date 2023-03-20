@@ -1,6 +1,6 @@
 import { Contract, JWKInterface, PstState } from 'warp-contracts';
 
-import { IOState } from '../src/contracts/types/types';
+import { DriveConfigState } from '../src/contracts/types/types';
 import { arweave, warp } from './setup.jest';
 import {
   DEFAULT_INSUFFICIENT_FUNDS_MESSAGE,

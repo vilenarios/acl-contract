@@ -1,4 +1,6 @@
-export type DriveConfigState = {
+import { PstState } from 'warp-contracts';
+
+export type DriveConfigState = PstState & {
   owner: string; // The owner of the drive
   name: string; // The entity name (eg drive name, folder name, file name) plus 'Access Control List'
   ticker: string; // 9 character, all caps as ACL-ID where ID is the first 4 characters of the entity id

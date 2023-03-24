@@ -58,6 +58,7 @@ export const removeRole = async (
           acl[target][n].modifiedBy = caller;
         } else {
           // Skip this access control as it has already ended for the user
+          n = acl[target].length;
         }
       }
     }

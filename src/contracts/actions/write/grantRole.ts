@@ -4,7 +4,12 @@ import {
   DEFAULT_INVALID_TARGET_MESSAGE,
 } from '@/constants';
 
-import { ContractResult, DriveConfigState, PstAction } from '../../types/types';
+import {
+  ContractResult,
+  DriveConfigState,
+  Permission,
+  PstAction,
+} from '../../types/types';
 
 declare const ContractError;
 declare const SmartWeave: any;
@@ -50,10 +55,11 @@ export const grantRole = async (
     for (let i = 0; i < roles[roleName].permissions.length; i += 1) {
       for (let n = 0; n < acl[target].length; n += 1) {
         if (
-          acl[target][n].permission === roles[roleName].permissions[i] &&
+          roles[roleName].permissions.includes(acl[target][n].permission) &&
           acl[target][n].end === 0
         ) {
-          // Skip this permission as the user already has it
+          // The user already has this permission
+          n = acl[target].length;
         } else {
           // Grant this user the permission
           acl[target].push({

@@ -15,15 +15,15 @@
     "managePermissions"
   ],
   "roles": {
-    "Full Control": {
+    "fullControl": {
       "description": "This role can read, write and manage permissions on this entity",
       "permissions": ["viewItems", "viewVersions","writeFiles", "createFolders", "modifyItems", "managePermissions"]
     },
-    "Member": {
+    "member": {
       "description": "This role can read and write to this entity",
       "permissions": ["viewItems", "viewVersions","writeFiles", "createFolders", "modifyItems"]
     },
-    "Guest": {
+    "guest": {
       "description": "This role can read current and historical versions of this entity",
       "permissions": ["viewItems", "viewVersions"]
     }

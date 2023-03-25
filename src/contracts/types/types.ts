@@ -10,17 +10,10 @@ export type DriveConfigState = PstState & {
     [name: string]: Role; // A role is a grouping of permissions that can be given to a user
   };
   acl: {
-    [identity: string]: AccessControls[]; // A list of all role based access given to a user
+    [identity: string]: AccessControls; // A list of all role based access given to a user
   };
   evolve: string; // The new Smartweave Source Code transaction to evolve this contract to
 };
-
-/*export type AccessControl = {
-  permission: Permission; // the permssion given to this identity
-  start: number; // the block height this access control was granted.
-  end: number; // the block height this access control ends.
-  modifiedBy: string; // the identity that last modified this access control
-};*/
 
 export type AccessControls = {
   [permissionName: string]: AccessControl[];

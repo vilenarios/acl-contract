@@ -1,9 +1,4 @@
-import {
-  AccessControl,
-  DriveConfigState,
-  Permission,
-  PstAction,
-} from './contracts/types/types';
+import { AccessControl } from './contracts/types/types';
 
 declare const ContractError;
 
@@ -19,10 +14,8 @@ export function isArweaveAddress(address: string) {
 export function isActiveAccessControl(accessControl: AccessControl[]): boolean {
   for (let i = 0; i < accessControl.length; i += 1) {
     if (accessControl[i].end === 0) {
-      console.log('ACCESS!');
       return true;
     }
   }
-  console.log('NO ACCESS!');
   return false;
 }

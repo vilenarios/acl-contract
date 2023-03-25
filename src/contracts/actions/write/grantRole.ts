@@ -30,10 +30,15 @@ export const grantRole = async (
   }
 
   // Does the user calling this have the ability to manage permissions?
-  if (
-    caller !== state.owner ||
-    !isActiveAccessControl(acl[caller][MANAGE_PERMISSIONS])
-  ) {
+  if (caller === state.owner) {
+    // this user has the ability to manage permissions
+  } else if (MANAGE_PERMISSIONS in acl[caller]) {
+    if (!isActiveAccessControl(acl[caller][MANAGE_PERMISSIONS])) {
+      throw new ContractError(DEFAULT_INVALID_PERMISSIONS_MESSAGE);
+    } else {
+      // this user has the ability to manage permissions
+    }
+  } else {
     throw new ContractError(DEFAULT_INVALID_PERMISSIONS_MESSAGE);
   }
 
@@ -54,13 +59,15 @@ export const grantRole = async (
     }
   } else {
     // The user has no ACLs, so lets create their first one
-    acl[target] = [];
+    acl[target] = {};
     for (let i = 0; i < roles[roleName].permissions.length; i += 1) {
-      acl[target][roles[roleName].permissions[i]] = {
-        start: +SmartWeave.block.height,
-        end: 0, // end of 0 means this is an active permissions and there is no end block height
-        modifiedBy: caller,
-      };
+      acl[target][roles[roleName].permissions[i]] = [
+        {
+          start: +SmartWeave.block.height,
+          end: 0, // end of 0 means this is an active permissions and there is no end block height
+          modifiedBy: caller,
+        },
+      ];
     }
   }
 

@@ -21,7 +21,7 @@ export const arweave = Arweave.init({
 
 // Warp
 export const warp = WarpFactory.forLocal(1820, arweave).use(new DeployPlugin());
-LoggerFactory.INST.logLevel('none');
+LoggerFactory.INST.logLevel('error');
 
 jest.setTimeout(20000);
 
@@ -128,7 +128,7 @@ describe('Testing the ArNS Registry Contract', () => {
     const currentState = await pst.currentState();
     const currentStateString = JSON.stringify(currentState);
     const currentStateJSON = JSON.parse(currentStateString);
-    expect(currentStateJSON.acl[walletAddress2].length).toEqual(
+    expect(Object.keys(currentStateJSON.acl[walletAddress2]).length).toEqual(
       currentStateJSON.roles[roleName].permissions.length,
     );
   });
@@ -145,7 +145,7 @@ describe('Testing the ArNS Registry Contract', () => {
     const currentState = await pst.currentState();
     const currentStateString = JSON.stringify(currentState);
     const currentStateJSON = JSON.parse(currentStateString);
-    expect(currentStateJSON.acl[walletAddress3].length).toEqual(
+    expect(Object.keys(currentStateJSON.acl[walletAddress3]).length).toEqual(
       currentStateJSON.roles[roleName].permissions.length,
     );
   });
@@ -161,7 +161,7 @@ describe('Testing the ArNS Registry Contract', () => {
     const currentState = await pst.currentState();
     const currentStateString = JSON.stringify(currentState);
     const currentStateJSON = JSON.parse(currentStateString);
-    expect(currentStateJSON.acl[walletAddress4].length).toEqual(
+    expect(Object.keys(currentStateJSON.acl[walletAddress4]).length).toEqual(
       currentStateJSON.roles[roleName].permissions.length,
     );
   });
@@ -178,12 +178,26 @@ describe('Testing the ArNS Registry Contract', () => {
     const currentState = await pst.currentState();
     const currentStateString = JSON.stringify(currentState);
     const currentStateJSON = JSON.parse(currentStateString);
-    expect(currentStateJSON.acl[walletAddress2].length).toEqual(
+    expect(Object.keys(currentStateJSON.acl[walletAddress2]).length).toEqual(
       currentStateJSON.roles[existingRole].permissions.length,
     );
   });
 
-  it('should not grant new role if invalid permissions', async () => {
+  it('should grant an invalid role name', async () => {
+    const roleName = 'full_control';
+    await pst.writeInteraction({
+      function: 'grantRole',
+      target: walletAddress5,
+      roleName,
+    });
+    await mineBlock(arweave);
+    const currentState = await pst.currentState();
+    const currentStateString = JSON.stringify(currentState);
+    const currentStateJSON = JSON.parse(currentStateString);
+    expect(currentStateJSON.acl[walletAddress5]).toEqual(undefined);
+  });
+
+  it('should not grant new role if the caller does not have the required permissions', async () => {
     pst.connect(wallet3);
     let roleName = 'fullControl';
     await pst.writeInteraction({
@@ -203,7 +217,7 @@ describe('Testing the ArNS Registry Contract', () => {
     const currentState = await pst.currentState();
     const currentStateString = JSON.stringify(currentState);
     const currentStateJSON = JSON.parse(currentStateString);
-    expect(currentStateJSON.acl[walletAddress3].length).toEqual(
+    expect(Object.keys(currentStateJSON.acl[walletAddress3]).length).toEqual(
       currentStateJSON.roles['member'].permissions.length,
     );
     expect(currentStateJSON.acl[walletAddress5]).toEqual(undefined);
@@ -221,9 +235,9 @@ describe('Testing the ArNS Registry Contract', () => {
     const currentState = await pst.currentState();
     const currentStateString = JSON.stringify(currentState);
     const currentStateJSON = JSON.parse(currentStateString);
-    expect(currentStateJSON.acl[walletAddress2].length).toEqual(
-      currentStateJSON.roles[roleName].permissions.length,
-    );
+    expect(
+      currentStateJSON.acl[walletAddress2]['managePermissions'][0].end,
+    ).toBeGreaterThan(0);
   });
 
   it('should regrant full control role to a user in the ACL as owner', async () => {
@@ -237,8 +251,25 @@ describe('Testing the ArNS Registry Contract', () => {
     const currentState = await pst.currentState();
     const currentStateString = JSON.stringify(currentState);
     const currentStateJSON = JSON.parse(currentStateString);
-    expect(currentStateJSON.acl[walletAddress2].length).toEqual(
-      currentStateJSON.roles[roleName].permissions.length,
-    );
+    expect(
+      currentStateJSON.acl[walletAddress2]['managePermissions'][1].end,
+    ).toEqual(0);
+  });
+
+  it('should not be able to remove your own permissions', async () => {
+    pst.connect(wallet2);
+    const roleName = 'fullControl';
+    await pst.writeInteraction({
+      function: 'removeRole',
+      target: walletAddress2,
+      roleName,
+    });
+    await mineBlock(arweave);
+    const currentState = await pst.currentState();
+    const currentStateString = JSON.stringify(currentState);
+    const currentStateJSON = JSON.parse(currentStateString);
+    expect(
+      currentStateJSON.acl[walletAddress2]['managePermissions'][1].end,
+    ).toEqual(0);
   });
 });

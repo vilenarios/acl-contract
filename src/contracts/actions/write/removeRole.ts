@@ -2,7 +2,9 @@ import {
   DEFAULT_INVALID_PERMISSIONS_MESSAGE,
   DEFAULT_INVALID_ROLE_MESSAGE,
   DEFAULT_INVALID_TARGET_MESSAGE,
+  MANAGE_PERMISSIONS,
 } from '@/constants';
+import { isActiveAccessControl } from '@/utilities';
 
 import { ContractResult, DriveConfigState, PstAction } from '../../types/types';
 
@@ -16,7 +18,6 @@ export const removeRole = async (
 ): Promise<ContractResult> => {
   const acl = state.acl;
   const roles = state.roles;
-  let hasPermissions = false;
 
   // Is this a valid role?
   if (!(roleName in roles)) {
@@ -30,35 +31,33 @@ export const removeRole = async (
 
   // Does the user calling this have the ability to manage permissions?
   if (caller === state.owner) {
-    hasPermissions = true;
-  } else if (caller in acl) {
-    for (let i = 0; i < acl[caller].length; i += 1) {
-      if (
-        acl[caller][i].permission === 'managePermissions' &&
-        acl[caller][i].end === 0
-      ) {
-        hasPermissions = true;
-      }
+    // this user has the ability to manage permissions
+  } else if (MANAGE_PERMISSIONS in acl[caller]) {
+    if (!isActiveAccessControl(acl[caller][MANAGE_PERMISSIONS])) {
+      throw new ContractError(DEFAULT_INVALID_PERMISSIONS_MESSAGE);
+    } else {
+      // this user has the ability to manage permissions
     }
-  }
-  if (hasPermissions === false) {
+  } else {
     throw new ContractError(DEFAULT_INVALID_PERMISSIONS_MESSAGE);
   }
 
   // The user must already be in the ACL to remove access controls.
   if (target in acl) {
+    // Check each permission in the role that is to be removed
     for (let i = 0; i < roles[roleName].permissions.length; i += 1) {
-      for (let n = 0; n < acl[target].length; n += 1) {
-        if (
-          roles[roleName].permissions.includes(acl[target][n].permission) &&
-          acl[target][n].end === 0
+      if (roles[roleName].permissions[i] in acl[target]) {
+        // The user has this permission so we must set all active permissions to inactive by modifying the block height end
+        for (
+          let n = 0;
+          n < acl[target][roles[roleName].permissions[i]].length;
+          n += 1
         ) {
-          // Put an endling block date on this access control
-          acl[target][n].end = +SmartWeave.block.height;
-          acl[target][n].modifiedBy = caller;
-        } else {
-          // Skip this access control as it has already ended for the user
-          n = acl[target].length;
+          if (acl[target][roles[roleName].permissions[i]][n].end === 0) {
+            acl[target][roles[roleName].permissions[i]][n].end =
+              +SmartWeave.block.height;
+            acl[target][roles[roleName].permissions[i]][n].modifiedBy = caller;
+          }
         }
       }
     }

@@ -53,6 +53,14 @@ export const grantRole = async (
   // Does this user already have any ACLs? If so, lets update them
   if (target in acl) {
     for (let i = 0; i < roles[roleName].permissions.length; i += 1) {
+      if (roles[roleName].permissions[i] in acl[target]) {
+        // The user has this permission already.  Is it active?
+        if (acl[target][roles[roleName].permissions[i]].end === 0) {
+          // This is an inactive permission
+        } 
+
+
+
       for (let n = 0; n < acl[target].length; n += 1) {
         if (
           roles[roleName].permissions.includes(acl[target][n].permission) &&
@@ -75,12 +83,11 @@ export const grantRole = async (
     // The user has no ACLs, so lets create their first one
     acl[target] = [];
     for (let i = 0; i < roles[roleName].permissions.length; i += 1) {
-      acl[target].push({
-        permission: roles[roleName].permissions[i],
+      acl[target][roles[roleName].permissions[i]] = {
         start: +SmartWeave.block.height,
         end: 0, // end of 0 means this is an active permissions and there is no end block height
         modifiedBy: caller,
-      });
+      };
     }
   }
 

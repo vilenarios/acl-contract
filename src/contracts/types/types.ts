@@ -15,11 +15,21 @@ export type DriveConfigState = PstState & {
   evolve: string; // The new Smartweave Source Code transaction to evolve this contract to
 };
 
-export type AccessControl = {
+/*export type AccessControl = {
   permission: Permission; // the permssion given to this identity
   start: number; // the block height this access control was granted.
   end: number; // the block height this access control ends.
   modifiedBy: string; // the identity that last modified this access control
+};*/
+
+export type AccessControl = {
+  [permissionName: string]: [
+    {
+      start: number; // the block height this access control was granted.
+      end: number; // the block height this access control ends.
+      modifiedBy: string; // the identity that last modified this access control
+    },
+  ];
 };
 
 export type Permission =

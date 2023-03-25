@@ -50,8 +50,8 @@ export const removeRole = async (
     for (let i = 0; i < roles[roleName].permissions.length; i += 1) {
       for (let n = 0; n < acl[target].length; n += 1) {
         if (
-          acl[target][n].permission === roles[roleName].permissions[i] &&
-          acl[target][n].end !== 0
+          roles[roleName].permissions.includes(acl[target][n].permission) &&
+          acl[target][n].end === 0
         ) {
           // Put an endling block date on this access control
           acl[target][n].end = +SmartWeave.block.height;

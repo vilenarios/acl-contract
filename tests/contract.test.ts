@@ -208,4 +208,37 @@ describe('Testing the ArNS Registry Contract', () => {
     );
     expect(currentStateJSON.acl[walletAddress5]).toEqual(undefined);
   });
+
+  it('should remove full control role to a user in the ACL as owner', async () => {
+    pst.connect(ownerWallet);
+    const roleName = 'fullControl';
+    await pst.writeInteraction({
+      function: 'removeRole',
+      target: walletAddress2,
+      roleName,
+    });
+    await mineBlock(arweave);
+    const currentState = await pst.currentState();
+    const currentStateString = JSON.stringify(currentState);
+    const currentStateJSON = JSON.parse(currentStateString);
+    expect(currentStateJSON.acl[walletAddress2].length).toEqual(
+      currentStateJSON.roles[roleName].permissions.length,
+    );
+  });
+
+  it('should regrant full control role to a user in the ACL as owner', async () => {
+    const roleName = 'fullControl';
+    await pst.writeInteraction({
+      function: 'grantRole',
+      target: walletAddress2,
+      roleName,
+    });
+    await mineBlock(arweave);
+    const currentState = await pst.currentState();
+    const currentStateString = JSON.stringify(currentState);
+    const currentStateJSON = JSON.parse(currentStateString);
+    expect(currentStateJSON.acl[walletAddress2].length).toEqual(
+      currentStateJSON.roles[roleName].permissions.length,
+    );
+  });
 });

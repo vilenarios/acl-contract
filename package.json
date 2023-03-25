@@ -1,6 +1,6 @@
 {
-  "name": "arns-pilot",
-  "version": "0.1.6",
+  "name": "acl-contract",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "build": "yarn run clean && yarn run build-ts && npm run cp",
@@ -17,8 +17,6 @@
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "arlocal": "^1.1.60",
     "arweave": "^1.13.1",
-    "axios": "^0.26.0",
-    "axios-retry": "^3.2.4",
     "babel-jest": "^27.5.0",
     "core-js": "^3.6.5",
     "eslint-plugin-jest-formatting": "^3.1.0",

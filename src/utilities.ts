@@ -1,5 +1,9 @@
-import axios, { AxiosResponse } from 'axios';
-import axiosRetry, { exponentialDelay } from 'axios-retry';
+import {
+  AccessControl,
+  DriveConfigState,
+  Permission,
+  PstAction,
+} from './contracts/types/types';
 
 declare const ContractError;
 
@@ -11,32 +15,14 @@ export function isArweaveAddress(address: string) {
   return trimmedAddress;
 }
 
-export async function retryFetch(reqURL: string): Promise<AxiosResponse<any>> {
-  const axiosInstance = axios.create();
-  const maxRetries = 10;
-  axiosRetry(axiosInstance, {
-    retries: maxRetries,
-    retryDelay: (retryNumber) => {
-      console.error(
-        `Retry attempt ${retryNumber}/${maxRetries} of request to ${reqURL}`,
-      );
-      return exponentialDelay(retryNumber);
-    },
-  });
-  return await axiosInstance.get(reqURL, {
-    responseType: 'arraybuffer',
-  });
-}
-
-// Gets the latest block height
-export async function getCurrentBlockHeight() {
-  let height = 0;
-  try {
-    const response = await retryFetch(`https://arweave.net/height`);
-    height = await response.data;
-    return height;
-  } catch (err) {
-    console.error(err);
+// Returns true if a given permission is active
+export function isActiveAccessControl(accessControl: AccessControl[]): boolean {
+  for (let i = 0; i < accessControl.length; i += 1) {
+    if (accessControl[i].end === 0) {
+      console.log('ACCESS!');
+      return true;
+    }
   }
-  return height;
+  console.log('NO ACCESS!');
+  return false;
 }
